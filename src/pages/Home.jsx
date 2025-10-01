@@ -8,7 +8,16 @@ import CourseModal from "../components/CourseModal.jsx";
 import { useHomeHook } from "../hooks/homehook.jsx";
 import { getCourses } from "../services/api/courseApi.js";
 import { useState, useEffect } from "react";
-
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { Provider } from "react-redux";
+import { store } from "./store";
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
 function Home() {
   const {
     filter,
