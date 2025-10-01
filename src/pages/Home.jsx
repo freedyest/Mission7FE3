@@ -6,6 +6,8 @@ import VideoCard from "../components/VideoCard";
 import FilterNav from "../components/FilterNav.jsx";
 import CourseModal from "../components/CourseModal.jsx";
 import { homehook } from "../hooks/homehook.jsx";
+import { getCourses } from "../services/api/courseApi";
+import { useState, useEffect } from "react";
 
 function Home() {
   const {
@@ -20,6 +22,19 @@ function Home() {
     handleSave,
     handleDelete,
   } = homehook();
+
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    getCourses()
+      .then((res) => {
+        console.log("API Response:", res.data); // 👉 cek di console
+        setCourses(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      });
+  }, []);
 
   // ✅ Ambil user yang bener dari localStorage
   const storedUser = localStorage.getItem("currentUser");
@@ -94,25 +109,30 @@ function Home() {
         )}
 
         {/* video course */}
+        {/* video course */}
         <section id="videocourse" className="w-full mt-10">
           <div className="w-full md:flex flex-wrap justify-evenly gap-6">
-            {filteredCourses.map((course) => (
-              <VideoCard
-                key={course.id}
-                image={course.image}
-                title={course.title}
-                description={course.desc}
-                avatar={course.avatar}
-                name={course.instructor}
-                role={course.role}
-                company={course.company}
-                rating={course.rating}
-                review={course.reviews}
-                price={course.price}
-                onEdit={currentUser ? () => handleEdit(course) : null}
-                onDelete={currentUser ? () => handleDelete(course.id) : null}
-              />
-            ))}
+            {courses
+              .filter(
+                (course) => filter === "all" || course.category === filter
+              )
+              .map((course) => (
+                <VideoCard
+                  key={course.id}
+                  image={course.image}
+                  title={course.title}
+                  description={course.desc} // kalau di API namanya "desc", tetap pake ini
+                  avatar={course.avatar}
+                  name={course.instructor}
+                  role={course.role}
+                  company={course.company}
+                  rating={course.rating}
+                  review={course.reviews}
+                  price={course.price}
+                  onEdit={currentUser ? () => handleEdit(course) : null}
+                  onDelete={currentUser ? () => handleDelete(course.id) : null}
+                />
+              ))}
           </div>
         </section>
 
