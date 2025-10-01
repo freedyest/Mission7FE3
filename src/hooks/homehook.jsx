@@ -18,7 +18,12 @@ export function useHomeHook() {
     setLoading(true);
     getCourses()
       .then((res) => {
-        setCourseList(res.data);
+        // pastikan id selalu string
+        const normalized = res.data.map((c) => ({
+          ...c,
+          id: String(c.id),
+        }));
+        setCourseList(normalized);
       })
       .catch((err) => {
         console.error("API Error:", err);
@@ -49,15 +54,20 @@ export function useHomeHook() {
   const handleSave = async (course) => {
     try {
       if (editingCourse) {
-        // update ke API
-        const res = await updateCourse(editingCourse.id, course);
+        // update ke API → pastikan id string
+        const res = await updateCourse(String(editingCourse.id), course);
         setCourseList((prev) =>
-          prev.map((c) => (c.id === editingCourse.id ? res.data : c))
+          prev.map((c) =>
+            String(c.id) === String(editingCourse.id) ? res.data : c
+          )
         );
       } else {
         // create ke API
         const res = await createCourse(course);
-        setCourseList((prev) => [...prev, res.data]);
+        setCourseList((prev) => [
+          ...prev,
+          { ...res.data, id: String(res.data.id) },
+        ]);
       }
     } catch (err) {
       console.error("Save Error:", err);
@@ -71,8 +81,10 @@ export function useHomeHook() {
   const handleDelete = async (id) => {
     if (window.confirm("Yakin mau hapus course ini?")) {
       try {
-        await deleteCourse(id);
-        setCourseList((prev) => prev.filter((c) => c.id !== id));
+        await deleteCourse(String(id));
+        setCourseList((prev) =>
+          prev.filter((c) => String(c.id) !== String(id))
+        );
       } catch (err) {
         console.error("Delete Error:", err);
       }
