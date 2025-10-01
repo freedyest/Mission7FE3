@@ -1,11 +1,30 @@
-import { useState, useMemo } from "react";
-import { courses as initialCourses } from "../data/courses";
+import { useState, useEffect, useMemo } from "react";
+import {
+  getCourses,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+} from "../services/api/courseApi";
 
-export function homehook() {
+export function useHomeHook() {
   const [filter, setFilter] = useState("all");
-  const [courseList, setCourseList] = useState(initialCourses);
+  const [courseList, setCourseList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch awal
+  useEffect(() => {
+    setLoading(true);
+    getCourses()
+      .then((res) => {
+        setCourseList(res.data);
+      })
+      .catch((err) => {
+        console.error("API Error:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   // Filtered courses
   const filteredCourses = useMemo(() => {
@@ -27,32 +46,42 @@ export function homehook() {
   };
 
   // Save (Create / Update)
-  const handleSave = (course) => {
-    if (editingCourse) {
-      setCourseList((prev) =>
-        prev.map((c) => (c.id === editingCourse.id ? { ...c, ...course } : c))
-      );
-    } else {
-      setCourseList((prev) => [
-        ...prev,
-        { ...course, id: crypto.randomUUID() },
-      ]);
+  const handleSave = async (course) => {
+    try {
+      if (editingCourse) {
+        // update ke API
+        const res = await updateCourse(editingCourse.id, course);
+        setCourseList((prev) =>
+          prev.map((c) => (c.id === editingCourse.id ? res.data : c))
+        );
+      } else {
+        // create ke API
+        const res = await createCourse(course);
+        setCourseList((prev) => [...prev, res.data]);
+      }
+    } catch (err) {
+      console.error("Save Error:", err);
+    } finally {
+      setEditingCourse(null);
+      setIsModalOpen(false);
     }
-    setEditingCourse(null);
-    setIsModalOpen(false);
   };
 
   // Delete
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Yakin mau hapus course ini?")) {
-      setCourseList((prev) => prev.filter((c) => c.id !== id));
+      try {
+        await deleteCourse(id);
+        setCourseList((prev) => prev.filter((c) => c.id !== id));
+      } catch (err) {
+        console.error("Delete Error:", err);
+      }
     }
   };
 
   return {
     filter,
     setFilter,
-    courseList,
     filteredCourses,
     isModalOpen,
     setIsModalOpen,
@@ -61,5 +90,6 @@ export function homehook() {
     handleEdit,
     handleSave,
     handleDelete,
+    loading,
   };
 }

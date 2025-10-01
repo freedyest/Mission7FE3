@@ -4,21 +4,20 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
   const [form, setForm] = useState({
     image: "",
     title: "",
-    description: "",
+    desc: "",
     avatar: "",
-    name: "",
+    instructor: "",
     role: "",
     company: "",
     rating: 0,
-    review: 0,
+    reviews: 0,
     price: "",
+    category: "",
   });
 
-  // mode input (url / upload)
   const [imageMode, setImageMode] = useState("url");
   const [avatarMode, setAvatarMode] = useState("url");
 
-  // initial data
   useEffect(() => {
     if (initialData) {
       setForm(initialData);
@@ -26,14 +25,15 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
       setForm({
         image: "",
         title: "",
-        description: "",
+        desc: "",
         avatar: "",
-        name: "",
+        instructor: "",
         role: "",
         company: "",
         rating: 0,
-        review: 0,
+        reviews: 0,
         price: "",
+        category: "",
       });
     }
   }, [initialData]);
@@ -46,7 +46,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
   const handleFileChange = (e, field) => {
     const file = e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file); // buat preview
+      const url = URL.createObjectURL(file);
       setForm({ ...form, [field]: url });
     }
   };
@@ -58,6 +58,8 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
   };
 
   if (!isOpen) return null;
+
+  const categories = ["desain", "pengembangan", "bisnis", "pemasaran"];
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -79,9 +81,10 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
             required
           />
+
           <p>Description</p>
           <textarea
-            name="description"
+            name="desc"
             value={form.desc}
             onChange={handleChange}
             placeholder="Description"
@@ -89,7 +92,22 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             rows="3"
           />
 
-          {/* Image field */}
+          <p>Category</p>
+          <select
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          >
+            <option value="">-- Pilih Category --</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
           <p>Image</p>
           <div className="flex gap-4 mb-2">
             <label>
@@ -133,7 +151,6 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             />
           )}
 
-          {/* Avatar field */}
           <p>Avatar</p>
           <div className="flex gap-4 mb-2">
             <label>
@@ -177,15 +194,16 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             />
           )}
 
-          <p>Nama</p>
+          <p>Instructor</p>
           <input
-            name="name"
+            name="instructor"
             value={form.instructor}
             onChange={handleChange}
             placeholder="Instructor Name"
             className="border p-2 rounded"
           />
-          <p>Pekerjaan</p>
+
+          <p>Role</p>
           <input
             name="role"
             value={form.role}
@@ -193,7 +211,8 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             placeholder="Role"
             className="border p-2 rounded"
           />
-          <p>Perusahaan</p>
+
+          <p>Company</p>
           <input
             name="company"
             value={form.company}
@@ -201,6 +220,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             placeholder="Company"
             className="border p-2 rounded"
           />
+
           <p>Rating</p>
           <input
             name="rating"
@@ -211,16 +231,18 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             placeholder="Rating"
             className="border p-2 rounded"
           />
-          <p>Review</p>
+
+          <p>Reviews</p>
           <input
-            name="review"
+            name="reviews"
             type="number"
             value={form.reviews}
             onChange={handleChange}
             placeholder="Review Count"
             className="border p-2 rounded"
           />
-          <p>Harga</p>
+
+          <p>Price</p>
           <input
             name="price"
             value={form.price}
@@ -229,7 +251,6 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
-          {/* tombol */}
           <div className="flex justify-end gap-2 mt-4">
             <button
               type="button"
