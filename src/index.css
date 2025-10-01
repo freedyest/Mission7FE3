@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.containervideo {
+  @apply flex bg-white overflow-hidden flex-wrap h-auto p-4 mb-8 rounded-lg justify-between w-full md:w-[30%];
+}
