@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 function CourseModal({ isOpen, onClose, onSave, initialData }) {
-  const [form, setForm] = useState({
+  const defaultForm = {
     image: "",
     title: "",
     desc: "",
@@ -13,30 +13,17 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
     reviews: 0,
     price: "",
     category: "",
-  });
+  };
+
+  const [form, setForm] = useState(defaultForm);
 
   const [imageMode, setImageMode] = useState("url");
   const [avatarMode, setAvatarMode] = useState("url");
 
+  // Reset form setiap kali modal dibuka
   useEffect(() => {
-    if (initialData) {
-      setForm(initialData);
-    } else {
-      setForm({
-        image: "",
-        title: "",
-        desc: "",
-        avatar: "",
-        instructor: "",
-        role: "",
-        company: "",
-        rating: 0,
-        reviews: 0,
-        price: "",
-        category: "",
-      });
-    }
-  }, [initialData]);
+    setForm(initialData || defaultForm);
+  }, [initialData, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +59,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
           onSubmit={handleSubmit}
           className="flex flex-col gap-3 max-h-[70vh] overflow-y-auto pr-2"
         >
+          {/* Title */}
           <p>Title</p>
           <input
             name="title"
@@ -82,6 +70,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             required
           />
 
+          {/* Description */}
           <p>Description</p>
           <textarea
             name="desc"
@@ -92,6 +81,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             rows="3"
           />
 
+          {/* Category */}
           <p>Category</p>
           <select
             name="category"
@@ -108,7 +98,8 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             ))}
           </select>
 
-          <p>Image</p>
+          {/* Image */}
+          <p>Image disarankan pakai url </p>
           <div className="flex gap-4 mb-2">
             <label>
               <input
@@ -151,7 +142,8 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             />
           )}
 
-          <p>Avatar</p>
+          {/* Avatar */}
+          <p>Avatar disarankan pakai url</p>
           <div className="flex gap-4 mb-2">
             <label>
               <input
@@ -194,6 +186,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             />
           )}
 
+          {/* Instructor */}
           <p>Instructor</p>
           <input
             name="instructor"
@@ -203,6 +196,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Role */}
           <p>Role</p>
           <input
             name="role"
@@ -212,6 +206,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Company */}
           <p>Company</p>
           <input
             name="company"
@@ -221,6 +216,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Rating */}
           <p>Rating</p>
           <input
             name="rating"
@@ -232,6 +228,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Reviews */}
           <p>Reviews</p>
           <input
             name="reviews"
@@ -242,6 +239,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Price */}
           <p>Price</p>
           <input
             name="price"
@@ -251,6 +249,7 @@ function CourseModal({ isOpen, onClose, onSave, initialData }) {
             className="border p-2 rounded"
           />
 
+          {/* Buttons */}
           <div className="flex justify-end gap-2 mt-4">
             <button
               type="button"
