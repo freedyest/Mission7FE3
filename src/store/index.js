@@ -1,8 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import courseReducer from "../slices/courseSlice";
+import courseReducer from "../slices/courseSlices.js";
+import authReducer from "../slices/authSlice.js";
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
-    course: courseReducer,
+    courses: courseReducer, // state course
+    auth: authReducer, // state auth (register/login)
   },
 });
+
+export default store;

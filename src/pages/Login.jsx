@@ -1,48 +1,57 @@
+// src/pages/Login.jsx
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header.jsx";
+import NavButton from "../components/NavButton.jsx";
 import eyesOff from "../assets/eyesoff.png";
 import eyesOn from "../assets/eyeson.png";
-import NavButton from "../components/NavButton.jsx";
-import { useState } from "react";
+import { fetchUsers } from "../slices/authSlice";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((state) => state.auth);
 
-  // state form
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // handle login
+  // Ambil semua user dari API saat component mount
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // take all user
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    if (!email || !password) {
+      alert("Semua field wajib diisi!");
+      return;
+    }
 
     if (users.length === 0) {
       alert("Belum ada akun terdaftar. Silakan register dulu.");
       return;
     }
 
-    // search user by email & password
+    // Cari user di state Redux
     const foundUser = users.find(
       (u) => u.email === email && u.password === password
     );
 
     if (foundUser) {
-      alert(`Login berhasil! Selamat datang ${foundUser.nama}`);
-      //  simpan user aktif ke localStorage
+      // Simpan user login ke localStorage (opsional) dan Redux state jika mau
       localStorage.setItem("currentUser", JSON.stringify(foundUser));
+      alert(`Login berhasil! Selamat datang ${foundUser.nama}`);
       navigate("/Home");
     } else {
       alert("Email atau password salah!");
     }
   };
 
-  // register
-  const handleRegister = (e) => {
-    e.preventDefault();
+  const handleRegister = () => {
     navigate("/Register");
   };
 
@@ -58,6 +67,8 @@ function Login() {
           <h2 className="text-[#333333AD] text-lg">
             Yuk, lanjutin belajarmu di videobelajar.
           </h2>
+
+          {error && <p className="text-red-500 mb-3">{error}</p>}
 
           <form onSubmit={handleLogin} className="mt-8">
             {/* Email */}
@@ -109,7 +120,7 @@ function Login() {
               </div>
             </div>
 
-            {/* forget password */}
+            {/* Forget password */}
             <div className="mb-5 text-end">
               <a href="#" className="text-darkgray hover:underline text-md">
                 Lupa password?
@@ -118,8 +129,13 @@ function Login() {
 
             {/* Tombol */}
             <div>
-              <NavButton type="submit" variant="primary" className="mb-8">
-                Masuk
+              <NavButton
+                type="submit"
+                variant="primary"
+                className="mb-8"
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Masuk"}
               </NavButton>
             </div>
 

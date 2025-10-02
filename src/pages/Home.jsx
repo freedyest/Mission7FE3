@@ -1,40 +1,62 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import NavButton from "../components/NavButton.jsx";
 import VideoCard from "../components/VideoCard";
 import FilterNav from "../components/FilterNav.jsx";
 import CourseModal from "../components/CourseModal.jsx";
-import { useHomeHook } from "../hooks/homehook.jsx";
-import { getCourses } from "../services/api/courseApi.js";
-import { useState, useEffect } from "react";
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import { Provider } from "react-redux";
-import { store } from "./store";
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <App />
-  </Provider>
-);
+
+import {
+  fetchCourses,
+  setFilter,
+  openModal,
+  closeModal,
+  addCourse,
+  editCourse,
+  removeCourse,
+} from "../slices/courseSlices.js";
+
 function Home() {
-  const {
-    filter,
-    setFilter,
-    filteredCourses,
-    isModalOpen,
-    setIsModalOpen,
-    editingCourse,
-    handleCreate,
-    handleEdit,
-    handleSave,
-    handleDelete,
-    loading,
-  } = useHomeHook();
+  const dispatch = useDispatch();
+  const { list, filter, isModalOpen, editingCourse, loading } = useSelector(
+    (state) => state.courses
+  );
 
   const storedUser = localStorage.getItem("currentUser");
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+  // load data awal
+  useEffect(() => {
+    dispatch(fetchCourses());
+  }, [dispatch]);
+
+  // filtered courses
+  const filteredCourses =
+    filter === "all"
+      ? list
+      : list.filter((course) => course.category === filter);
+
+  // handler
+  const handleCreate = () => dispatch(openModal(null));
+  const handleEdit = (course) => dispatch(openModal(course));
+
+  const handleSave = (course) => {
+    if (editingCourse) {
+      dispatch(editCourse({ id: editingCourse.id, data: course }));
+    } else {
+      dispatch(addCourse(course));
+    }
+    dispatch(closeModal());
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Yakin mau hapus course ini?")) {
+      dispatch(removeCourse(id));
+    }
+  };
 
   const categories = [
     { key: "all", label: "Semua Kelas" },
@@ -90,7 +112,10 @@ function Home() {
         </section>
 
         {/* filter nav */}
-        <FilterNav categories={categories} onFilterChange={setFilter} />
+        <FilterNav
+          categories={categories}
+          onFilterChange={(value) => dispatch(setFilter(value))}
+        />
 
         {/* tombol create → hanya muncul kalau ada user login */}
         {currentUser?.email && (
@@ -168,7 +193,7 @@ function Home() {
       {/* modal */}
       <CourseModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => dispatch(closeModal())}
         onSave={handleSave}
         initialData={editingCourse}
       />

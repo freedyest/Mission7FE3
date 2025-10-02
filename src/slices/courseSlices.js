@@ -6,75 +6,89 @@ import {
   deleteCourse,
 } from "../services/api/courseApi";
 
-// Async Thunks
-export const fetchCourses = createAsyncThunk("course/fetchAll", async () => {
-  const res = await getCourses();
-  return res.data.map((c) => ({ ...c, id: String(c.id) }));
-});
+// Thunk untuk fetch data dari API
+export const fetchCourses = createAsyncThunk(
+  "courses/fetchCourses",
+  async () => {
+    const res = await getCourses();
+    return res.data.map((c) => ({ ...c, id: String(c.id) }));
+  }
+);
 
-export const addCourse = createAsyncThunk("course/add", async (course) => {
-  const res = await createCourse(course);
-  return { ...res.data, id: String(res.data.id) };
-});
+// Thunk untuk create
+export const addCourse = createAsyncThunk(
+  "courses/addCourse",
+  async (course) => {
+    const res = await createCourse(course);
+    return { ...res.data, id: String(res.data.id) };
+  }
+);
 
+// Thunk untuk update
 export const editCourse = createAsyncThunk(
-  "course/edit",
+  "courses/editCourse",
   async ({ id, data }) => {
     const res = await updateCourse(String(id), data);
     return res.data;
   }
 );
 
-export const removeCourse = createAsyncThunk("course/delete", async (id) => {
-  await deleteCourse(String(id));
-  return id;
-});
+// Thunk untuk delete
+export const removeCourse = createAsyncThunk(
+  "courses/removeCourse",
+  async (id) => {
+    await deleteCourse(String(id));
+    return String(id);
+  }
+);
 
 const courseSlice = createSlice({
-  name: "course",
+  name: "courses",
   initialState: {
-    courseList: [],
+    list: [],
     filter: "all",
+    isModalOpen: false,
+    editingCourse: null,
     loading: false,
-    error: null,
   },
   reducers: {
     setFilter: (state, action) => {
       state.filter = action.payload;
     },
+    openModal: (state, action) => {
+      state.isModalOpen = true;
+      state.editingCourse = action.payload || null;
+    },
+    closeModal: (state) => {
+      state.isModalOpen = false;
+      state.editingCourse = null;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // fetch
       .addCase(fetchCourses.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchCourses.fulfilled, (state, action) => {
+        state.list = action.payload;
         state.loading = false;
-        state.courseList = action.payload;
       })
-      .addCase(fetchCourses.rejected, (state, action) => {
+      .addCase(fetchCourses.rejected, (state) => {
         state.loading = false;
-        state.error = action.error.message;
       })
-      // add
       .addCase(addCourse.fulfilled, (state, action) => {
-        state.courseList.push(action.payload);
+        state.list.push(action.payload);
       })
-      // edit
       .addCase(editCourse.fulfilled, (state, action) => {
-        state.courseList = state.courseList.map((c) =>
-          String(c.id) === String(action.payload.id) ? action.payload : c
+        state.list = state.list.map((c) =>
+          c.id === String(action.payload.id) ? action.payload : c
         );
       })
-      // delete
       .addCase(removeCourse.fulfilled, (state, action) => {
-        state.courseList = state.courseList.filter(
-          (c) => String(c.id) !== String(action.payload)
-        );
+        state.list = state.list.filter((c) => c.id !== String(action.payload));
       });
   },
 });
 
-export const { setFilter } = courseSlice.actions;
+export const { setFilter, openModal, closeModal } = courseSlice.actions;
 export default courseSlice.reducer;

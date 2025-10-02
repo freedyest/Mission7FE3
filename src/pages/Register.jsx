@@ -1,25 +1,30 @@
+// src/pages/Register.jsx
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/Header";
+import NavButton from "../components/NavButton";
 import eyesOff from "../assets/eyesoff.png";
 import eyesOn from "../assets/eyeson.png";
-import NavButton from "../components/NavButton";
+import { register, fetchUsers } from "../slices/authSlice";
 
 function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error, users } = useSelector((state) => state.auth);
 
-  // State form
+  // Form state
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
 
-  // Toggle show/hide
+  // Toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Negara
+  // Country dropdown
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState({
     flag: "https://flagcdn.com/w20/id.png",
@@ -37,11 +42,15 @@ function Register() {
     setDropdownOpen(false);
   };
 
-  // Handle register
+  // Ambil semua user dulu (untuk validasi email duplikat)
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
   const handleRegister = (e) => {
     e.preventDefault();
 
-    // Validate
+    // Validasi form
     if (!nama || !email || !phone || !password || !confirm) {
       alert("Semua field wajib diisi!");
       return;
@@ -51,28 +60,27 @@ function Register() {
       return;
     }
 
-    // take old data
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    // Cek email duplikat
+    // Cek duplikat email dari Redux state
     const userExists = users.find((u) => u.email === email);
     if (userExists) {
       alert("Email sudah terdaftar!");
       return;
     }
 
-    // save user
     const newUser = {
       nama,
       email,
       phone: `${selectedCountry.code}${phone}`,
       password,
     };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
 
-    alert("Registrasi berhasil! Silakan login.");
-    navigate("/login");
+    dispatch(register(newUser))
+      .unwrap()
+      .then(() => {
+        alert("Registrasi berhasil! Silakan login.");
+        navigate("/login");
+      })
+      .catch((err) => alert(err));
   };
 
   return (
@@ -88,6 +96,8 @@ function Register() {
           <h2 className="text-darkgray text-lg">
             Yuk, daftarkan akunmu sekarang juga!
           </h2>
+
+          {error && <p className="text-red-500 mb-3">{error}</p>}
 
           <form onSubmit={handleRegister} className="mt-8">
             {/* Nama */}
@@ -204,7 +214,7 @@ function Register() {
               </div>
             </div>
 
-            {/* confirm Password */}
+            {/* Confirm Password */}
             <div className="mb-5 text-start">
               <label htmlFor="confirm">
                 Konfirmasi Kata Sandi <span className="text-red-500">*</span>
@@ -233,8 +243,13 @@ function Register() {
             </div>
 
             {/* Tombol */}
-            <NavButton type="submit" variant="primary" className="mb-6">
-              Register
+            <NavButton
+              type="submit"
+              variant="primary"
+              className="mb-6"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Register"}
             </NavButton>
 
             <NavButton
