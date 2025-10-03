@@ -9,7 +9,7 @@ function Header({ withUserMenu = false }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
-  // cek localStorage user login?
+  // cek localStorage
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     setCurrentUser(user);
