@@ -18,7 +18,7 @@ export function useHomeHook() {
     setLoading(true);
     getCourses()
       .then((res) => {
-        // pastikan id selalu string
+        // id
         const normalized = res.data.map((c) => ({
           ...c,
           id: String(c.id),

@@ -1,4 +1,3 @@
-// src/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { registerUser, getUsers } from "../services/api/authApi";
 
@@ -8,7 +7,7 @@ export const register = createAsyncThunk("auth/register", async (user) => {
   return res.data;
 });
 
-// (Optional) Ambil semua user untuk validasi login
+// validasi login
 export const fetchUsers = createAsyncThunk("auth/fetchUsers", async () => {
   const res = await getUsers();
   return res.data;

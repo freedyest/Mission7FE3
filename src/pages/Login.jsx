@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +17,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Ambil semua user dari API saat component mount
+  // take all api
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
@@ -42,7 +41,7 @@ function Login() {
     );
 
     if (foundUser) {
-      // Simpan user login ke localStorage (opsional) dan Redux state jika mau
+      //  user login ke localStorage  dan Redux state
       localStorage.setItem("currentUser", JSON.stringify(foundUser));
       alert(`Login berhasil! Selamat datang ${foundUser.nama}`);
       navigate("/Home");
@@ -138,34 +137,33 @@ function Login() {
                 {loading ? "Loading..." : "Masuk"}
               </NavButton>
             </div>
-
-            <div>
-              <NavButton
-                type="button"
-                onClick={handleRegister}
-                variant="secondary"
-                className="mb-6"
-              >
-                Register
-              </NavButton>
-            </div>
-
-            {/* Atau */}
-            <div className="flex items-center my-6">
-              <hr className="flex-grow border-gray-300" />
-              <span className="px-3 text-gray-500 text-sm">atau</span>
-              <hr className="flex-grow border-gray-300" />
-            </div>
-
-            <button className="flex justify-center items-center w-full font-bold bg-white text-darkgray py-2 px-4 rounded-md hover:bg-slate-400 border border-darkgray">
-              <img
-                src={`${import.meta.env.BASE_URL}google.png`}
-                alt="Google"
-                className="h-10 w-10 mr-2"
-              />
-              <span>Masuk dengan Google</span>
-            </button>
           </form>
+          <div>
+            <NavButton
+              type="button"
+              onClick={handleRegister}
+              variant="secondary"
+              className="mb-6"
+            >
+              Register
+            </NavButton>
+          </div>
+
+          {/* Atau */}
+          <div className="flex items-center my-6">
+            <hr className="flex-grow border-gray-300" />
+            <span className="px-3 text-gray-500 text-sm">atau</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+
+          <button className="flex justify-center items-center w-full font-bold bg-white text-darkgray py-2 px-4 rounded-md hover:bg-slate-400 border border-darkgray">
+            <img
+              src={`${import.meta.env.BASE_URL}google.png`}
+              alt="Google"
+              className="h-10 w-10 mr-2"
+            />
+            <span>Masuk dengan Google</span>
+          </button>
         </div>
       </section>
     </div>
