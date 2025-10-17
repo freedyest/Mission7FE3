@@ -74,7 +74,7 @@ function Home() {
 
         {/* spotlight */}
         <section id="spotlight" className="pt-28 md:pt-36 bg-white rounded-lg">
-          <div className="relative w-full h-[500px] md:h-80 flex items-center justify-center rounded-lg">
+          <div className="relative w-full h-[500px] md:h-96 flex items-center justify-center rounded-lg">
             <img
               src={`${import.meta.env.BASE_URL}spot.jpg`}
               alt="Spotlight"
