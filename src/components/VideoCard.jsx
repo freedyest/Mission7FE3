@@ -98,6 +98,9 @@ function VideoCard({
             <p className="text-darkgray text-sm">{role}</p>
           </div>
           <p className="hidden md:flex font-semibold text-black mt-6 ">
+            <span className="display-none md:inline text-black font-normal mr-2">
+              di
+            </span>
             {company}
           </p>
         </div>
